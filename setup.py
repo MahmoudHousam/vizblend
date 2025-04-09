@@ -22,12 +22,12 @@ setup(
         "kaleido",
     ],
     classifiers=[
-        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.7",
         "Operating System :: OS Independent",
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: MIT License",
         "Intended Audience :: Developers",
         "Topic :: Scientific/Engineering :: Visualization",
     ],
-    python_requires=">=3.9",
+    python_requires=">=3.7",
 )

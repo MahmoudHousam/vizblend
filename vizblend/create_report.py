@@ -1,6 +1,7 @@
 import os
 from vizblend.figure_defaults import figure_defaults
 from jinja2 import Environment, FileSystemLoader
+from importlib.resources import files
 
 
 class CreateReport:
@@ -42,7 +43,8 @@ class CreateReport:
             divs.append(div)
 
         # Set up the Jinja2 environment
-        env = Environment(loader=FileSystemLoader("templates"))
+        templates_dir = files("vizblend").joinpath("templates")
+        env = Environment(loader=FileSystemLoader(templates_dir))
         template = env.get_template("report_template.html")
 
         # Render the template with the required variables

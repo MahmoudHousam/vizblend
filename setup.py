@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="vizblend",
-    version="2.1.1",
+    version="3.0.0",
     author="Mahmoud Housam",
     author_email="mahmoudhousam60@gmail.com",
     description="Seamlessly integrates Plotly interactive visualizations into a single standalone HTML file offering a modern presentation-like experience with the flexibility of a web-based report",

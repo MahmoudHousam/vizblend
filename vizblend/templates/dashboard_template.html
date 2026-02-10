@@ -71,13 +71,19 @@
       .card {
         position: relative;
         background: #fff;
-        border: none;
+        border: 1px solid transparent;
         border-radius: 8px;
         overflow: hidden;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
         height: 100%;
         display: flex;
         flex-direction: column;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+        border-color: #007bff;
       }
       .chart-wrapper {
         position: relative;
@@ -97,8 +103,8 @@
       .chart-wrapper .plotly-graph-div {
         width: 100% !important;
         height: 100% !important;
-        display: block !important;
-        position: relative;
+        position: absolute !important;
+        inset: 0;
       }
 
       .expand-btn {
@@ -131,11 +137,12 @@
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.4);
         z-index: 1000;
         align-items: center;
         justify-content: center;
         padding: 40px;
+        backdrop-filter: blur(4px);
       }
       .modal-backdrop.show {
         display: flex;
@@ -144,10 +151,10 @@
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        max-width: 90vw;
-        max-height: 85vh;
-        width: 900px;
-        height: 600px;
+        max-height: 1200px;
+        max-width: 1400px;
+        width: 95vw;
+        height: 90vh;
         display: flex;
         flex-direction: column;
         position: relative;
@@ -166,13 +173,16 @@
       }
       .modal-chart-container {
         flex: 1;
+        display: flex;
+        flex-direction: column;
         min-height: 0;
-        padding: 16px;
+        padding: 8px;
       }
       .modal-chart-container .plotly-graph-div {
         width: 100% !important;
         height: 100% !important;
         min-height: 400px !important;
+        flex: 1;
       }
 
       .collapse-btn {
@@ -355,26 +365,28 @@
 
         function openModal(card) {
           const wrapper = card.querySelector('.chart-wrapper');
-          const firstChild = wrapper.firstElementChild;
-          if (!firstChild) return;
+          const chartEl = wrapper.querySelector('.plotly-graph-div');
+          if (!chartEl) return;
+
           expandedCard = card;
           expandedChartWrapper = wrapper;
-          // Extract title from Plotly chart if available
-          const plotlyDiv = wrapper.querySelector('.plotly-graph-div');
-          let chartTitle = 'Chart';
-          if (plotlyDiv && plotlyDiv.querySelector('.gtitle')) {
-            const titleEl = plotlyDiv.querySelector('.gtitle text');
-            if (titleEl) chartTitle = titleEl.textContent || 'Chart';
-          }
-          document.getElementById('modal-title').textContent = chartTitle;
+
           const container = document.getElementById('modal-chart-container');
           container.innerHTML = '';
-          container.appendChild(firstChild);
+          container.appendChild(chartEl); // Move the chart
+
           document.getElementById('modal').classList.add('show');
-          document.getElementById('modal').setAttribute('aria-hidden', 'false');
-          if (typeof Plotly !== 'undefined' && firstChild.id) {
-            try { Plotly.Plots.resize(firstChild); } catch (e) {}
-          }
+
+          // The "Auto-Linker": Observes when the modal container changes size
+          const ro = new ResizeObserver(() => {
+            if (typeof Plotly !== 'undefined') {
+              Plotly.Plots.resize(chartEl);
+            }
+          });
+          
+          ro.observe(container);
+          // Store observer on the element so we can disconnect it later
+          chartEl._ro = ro; 
         }
 
         function closeModal() {

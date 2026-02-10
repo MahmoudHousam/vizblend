@@ -16,6 +16,7 @@
         height: 100%;
         width: 100%;
         overflow-x: hidden;
+        background-color: #f5f5f5;
       }
 
       .logo {
@@ -41,6 +42,7 @@
         display: none;
         padding: 24px;
         min-height: calc(100vh - 120px);
+        background-color: #f5f5f5;
       }
       .page.active {
         display: block;
@@ -48,10 +50,12 @@
 
       .grid {
         display: grid;
-        gap: 20px;
+        gap: 24px;
         grid-template-columns: repeat(3, 1fr);
+        grid-auto-rows: 1fr;
         max-width: 1400px;
         margin: 0 auto;
+        align-items: stretch;
       }
       @media (max-width: 900px) {
         .grid {
@@ -67,51 +71,59 @@
       .card {
         position: relative;
         background: #fff;
-        border: 1px solid #e0e0e0;
+        border: none;
         border-radius: 8px;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-      }
-      .card-title {
-        padding: 10px 12px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        background: #f5f5f5;
-        border-bottom: 1px solid #eee;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 400px;
       }
       .chart-wrapper {
         position: relative;
-        min-height: 220px;
-        padding: 12px;
+        flex: 1;
+        width: 100%;
+        min-height: 380px;
+        padding: 0;
+        display: block;
+      }
+      .chart-wrapper > div {
+        width: 100% !important;
+        height: 380px !important;
+        min-height: 380px !important;
+        display: block !important;
       }
       .chart-wrapper .plotly-graph-div {
         width: 100% !important;
-        min-height: 200px !important;
+        height: 380px !important;
+        min-height: 380px !important;
+        display: block !important;
       }
 
       .expand-btn {
         position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 36px;
-        height: 36px;
+        top: 12px;
+        right: 12px;
+        width: 32px;
+        height: 32px;
         border: none;
-        border-radius: 6px;
-        background: rgba(0, 0, 0, 0.06);
+        border-radius: 4px;
+        background: transparent;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 2;
+        z-index: 10;
         transition: background 0.2s;
+        font-size: 18px;
+        color: #666;
+        font-weight: normal;
+        padding: 0;
       }
       .expand-btn:hover {
-        background: rgba(0, 0, 0, 0.12);
-      }
-      .expand-btn svg {
-        width: 20px;
-        height: 20px;
-        fill: #555;
+        background: rgba(0, 0, 0, 0.05);
+        color: #333;
       }
 
       /* Modal: centered, not full-screen */
@@ -173,14 +185,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 22px;
+        color: #333;
       }
       .collapse-btn:hover {
         background: #e0e0e0;
-      }
-      .collapse-btn svg {
-        width: 22px;
-        height: 22px;
-        fill: #333;
       }
 
       /* Pagination */
@@ -241,10 +250,9 @@
           data-page="{{ parent_loop.index0 }}"
           data-index="{{ loop.index0 }}"
         >
-          <div class="card-title">{{ chart.title }}</div>
           <div class="chart-wrapper">{{ chart.html | safe }}</div>
-          <button type="button" class="expand-btn" aria-label="Expand chart">
-            ...
+          <button type="button" class="expand-btn" aria-label="Expand chart" title="Expand">
+            <span class="expand-icon">⛶</span>
           </button>
         </div>
         {% endfor %}
@@ -271,11 +279,7 @@
             aria-label="Collapse chart"
             title="Collapse"
           >
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"
-              />
-            </svg>
+            ⊟
           </button>
         </div>
         <div class="modal-chart-container" id="modal-chart-container"></div>
@@ -313,9 +317,14 @@
           if (!firstChild) return;
           expandedCard = card;
           expandedChartWrapper = wrapper;
-          expandedTitle = card.querySelector('.card-title');
-          expandedTitle = expandedTitle ? expandedTitle.textContent : 'Chart';
-          document.getElementById('modal-title').textContent = expandedTitle;
+          // Extract title from Plotly chart if available
+          const plotlyDiv = wrapper.querySelector('.plotly-graph-div');
+          let chartTitle = 'Chart';
+          if (plotlyDiv && plotlyDiv.querySelector('.gtitle')) {
+            const titleEl = plotlyDiv.querySelector('.gtitle text');
+            if (titleEl) chartTitle = titleEl.textContent || 'Chart';
+          }
+          document.getElementById('modal-title').textContent = chartTitle;
           const container = document.getElementById('modal-chart-container');
           container.innerHTML = '';
           container.appendChild(firstChild);
@@ -345,14 +354,14 @@
         }
 
         function setButtonExpand(btn) {
-          btn.querySelector('.icon-expand').style.display = '';
-          btn.querySelector('.icon-collapse').style.display = 'none';
+          const icon = btn.querySelector('.expand-icon');
+          if (icon) icon.textContent = '⛶';
           btn.setAttribute('aria-label', 'Expand chart');
           btn.setAttribute('title', 'Expand');
         }
         function setButtonCollapse(btn) {
-          btn.querySelector('.icon-expand').style.display = 'none';
-          btn.querySelector('.icon-collapse').style.display = '';
+          const icon = btn.querySelector('.expand-icon');
+          if (icon) icon.textContent = '⊟';
           btn.setAttribute('aria-label', 'Collapse chart');
           btn.setAttribute('title', 'Collapse');
         }

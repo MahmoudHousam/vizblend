@@ -78,27 +78,27 @@
         height: 100%;
         display: flex;
         flex-direction: column;
-        min-height: 400px;
       }
       .chart-wrapper {
         position: relative;
         flex: 1;
         width: 100%;
-        min-height: 380px;
         padding: 0;
         display: block;
+        aspect-ratio: 4 / 3;
+        min-height: 0;
       }
       .chart-wrapper > div {
         width: 100% !important;
-        height: 380px !important;
-        min-height: 380px !important;
+        height: 100% !important;
         display: block !important;
+        position: relative;
       }
       .chart-wrapper .plotly-graph-div {
         width: 100% !important;
-        height: 380px !important;
-        min-height: 380px !important;
+        height: 100% !important;
         display: block !important;
+        position: relative;
       }
 
       .expand-btn {
@@ -294,6 +294,39 @@
         let expandedChartWrapper = null;
         let expandedTitle = '';
 
+        function initializeChartsOnPage(pageElement) {
+          if (!pageElement || typeof Plotly === 'undefined') return;
+          
+          // Find all Plotly chart containers on this page
+          const chartWrappers = pageElement.querySelectorAll('.chart-wrapper');
+          chartWrappers.forEach(function(wrapper) {
+            // Find the Plotly div (it's usually the first child div with an id)
+            const plotlyDiv = wrapper.querySelector('.plotly-graph-div') || 
+                             wrapper.querySelector('div[id]') ||
+                             wrapper.firstElementChild;
+            
+            if (plotlyDiv && plotlyDiv.id) {
+              // Wait for container to have dimensions
+              requestAnimationFrame(function() {
+                const container = wrapper;
+                const containerWidth = container.offsetWidth;
+                const containerHeight = container.offsetHeight;
+                
+                if (containerWidth > 0 && containerHeight > 0) {
+                  try {
+                    // Resize the chart to match its container dimensions
+                    Plotly.Plots.resize(plotlyDiv);
+                  } catch (e) {
+                    // If resize fails, the chart might need to be redrawn
+                    // This can happen if Plotly hasn't fully initialized the chart yet
+                    console.debug('Chart initialization:', e);
+                  }
+                }
+              });
+            }
+          });
+        }
+
         function showPage(idx) {
           document.querySelectorAll('.page').forEach(function(el, i) {
             el.classList.toggle('active', i === idx);
@@ -302,6 +335,15 @@
           document.getElementById('current-page-num').textContent = idx + 1;
           document.getElementById('prev-btn').disabled = idx === 0;
           document.getElementById('next-btn').disabled = idx >= totalPages - 1;
+          
+          // Lazy initialize charts on the active page
+          const activePage = document.querySelector('.page.active');
+          if (activePage) {
+            // Small delay to ensure page is visible before initializing
+            setTimeout(function() {
+              initializeChartsOnPage(activePage);
+            }, 50);
+          }
         }
 
         document.getElementById('prev-btn').onclick = function() {
@@ -342,9 +384,18 @@
           if (chartEl) expandedChartWrapper.appendChild(chartEl);
           document.getElementById('modal').classList.remove('show');
           document.getElementById('modal').setAttribute('aria-hidden', 'true');
+          
+          // Resize chart back to card after moving it
           if (typeof Plotly !== 'undefined' && chartEl && chartEl.id) {
-            try { Plotly.Plots.resize(chartEl); } catch (e) {}
+            requestAnimationFrame(function() {
+              try {
+                Plotly.Plots.resize(chartEl);
+              } catch (e) {
+                console.debug('Chart resize on collapse:', e);
+              }
+            });
           }
+          
           if (expandedCard) {
             var btn = expandedCard.querySelector('.expand-btn');
             if (btn) setButtonExpand(btn);
@@ -389,7 +440,45 @@
           if (e.key === 'Escape' && document.getElementById('modal').classList.contains('show')) closeModal();
         });
 
+        // Initialize first page on load
         showPage(0);
+        
+        // Also initialize charts when Plotly is ready (if not already loaded)
+        if (typeof Plotly !== 'undefined') {
+          setTimeout(function() {
+            const activePage = document.querySelector('.page.active');
+            if (activePage) initializeChartsOnPage(activePage);
+          }, 200);
+        } else {
+          // Wait for Plotly to load
+          window.addEventListener('load', function() {
+            setTimeout(function() {
+              const activePage = document.querySelector('.page.active');
+              if (activePage) initializeChartsOnPage(activePage);
+            }, 100);
+          });
+        }
+        
+        // Handle window resize for responsive charts
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(function() {
+            if (typeof Plotly !== 'undefined') {
+              const activePage = document.querySelector('.page.active');
+              if (activePage) initializeChartsOnPage(activePage);
+              // Also resize expanded chart if modal is open
+              if (document.getElementById('modal').classList.contains('show')) {
+                const modalChart = document.getElementById('modal-chart-container').firstElementChild;
+                if (modalChart && modalChart.id) {
+                  try {
+                    Plotly.Plots.resize(modalChart);
+                  } catch (e) {}
+                }
+              }
+            }
+          }, 150);
+        });
       })();
     </script>
   </body>

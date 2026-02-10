@@ -49,14 +49,13 @@ class CreateDashboard:
         # Build chart data: HTML snippet + title per figure
         chart_items = []
         for fig in self.figures:
-            # Ensure chart has a height if not set (match card height)
-            if not hasattr(fig.layout, 'height') or fig.layout.height is None:
-                fig.update_layout(height=380)
-            
             div = fig.to_html(
                 full_html=False,
                 include_plotlyjs=False,
-                config={"displayModeBar": False},
+                config={
+                    "displayModeBar": False,
+                    "responsive": True,
+                },
             )
             title = _get_figure_title(fig)
             chart_items.append({"html": div, "title": title or "Chart"})

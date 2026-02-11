@@ -234,6 +234,15 @@
     </style>
   </head>
   <body>
+    <div class="pagination">
+      <button type="button" id="prev-btn">Previous</button>
+      <span class="page-info"
+        >Page <span id="current-page-num">1</span> of
+        <span id="total-pages-num">{{ total_pages }}</span></span
+      >
+      <button type="button" id="next-btn">Next</button>
+    </div>
+    
     <div class="dashboard-header">
       {% if logo_path %}
       <img src="{{ logo_path }}" alt="Logo" class="logo" />
@@ -269,15 +278,6 @@
       </div>
     </div>
     {% endfor %}
-
-    <div class="pagination">
-      <button type="button" id="prev-btn">Previous</button>
-      <span class="page-info"
-        >Page <span id="current-page-num">1</span> of
-        <span id="total-pages-num">{{ total_pages }}</span></span
-      >
-      <button type="button" id="next-btn">Next</button>
-    </div>
 
     <div class="modal-backdrop" id="modal" aria-hidden="true">
       <div class="modal-content">
@@ -424,7 +424,7 @@
         }
         function setButtonCollapse(btn) {
           const icon = btn.querySelector('.expand-icon');
-          if (icon) icon.textContent = '⊟';
+          if (icon) icon.textContent = 'X';
           btn.setAttribute('aria-label', 'Collapse chart');
           btn.setAttribute('title', 'Collapse');
         }

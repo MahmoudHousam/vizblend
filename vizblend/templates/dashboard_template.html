@@ -6,298 +6,213 @@
     <title>{{ dashboard_name }}</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
-      * {
-        box-sizing: border-box;
-      }
-      body,
-      html {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        width: 100%;
+      * { box-sizing: border-box; }
+      
+      /* App-like Layout */
+      body, html {
+        margin: 0; padding: 0;
+        height: 100vh; width: 100vw;
         overflow: hidden;
-        background-color: #f5f5f5;
+        background-color: #f8fafc;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       }
 
-      .logo {
-        width: 70px;
-        margin: 20px;
-      }
-
+      /* Sleek Header */
       .dashboard-header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        padding: 12px 20px;
-        border-bottom: 1px solid #e0e0e0;
-        background: #fafafa;
-      }
-      .dashboard-header h1 {
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 600;
+        justify-content: center;
+        padding: 0 40px;
+        height: 64px;
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        position: relative;
+        flex-shrink: 0;
       }
 
+      .dashboard-header h1 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+      }
+
+      .logo {
+        position: absolute;
+        left: 200px; /* Room for pagination */
+        height: 32px;
+        width: auto;
+      }
+
+      /* Top-Left Navigation */
+      .pagination {
+        position: absolute;
+        left: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 8px;
+      }
+
+      .pagination button {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        border: none;
+        border-radius: 6px;
+        background: #ffffff;
+        cursor: pointer;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        transition: all 0.2s;
+      }
+
+      .pagination button:hover:not(:disabled) { background: #3b82f6; color: white; }
+      .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+      .pagination .page-info {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #64748b;
+        padding: 0 8px;
+      }
+
+      /* Grid and Content Area */
       .page {
         display: none;
         padding: 24px;
-        padding-bottom: 100px;
-        height: calc(100vh - 180px);
+        height: calc(100vh - 64px);
         overflow-y: auto;
-        background-color: #f5f5f5;
       }
-      .page.active {
-        display: block;
-      }
+      .page.active { display: block; }
 
       .grid {
         display: grid;
         gap: 24px;
         grid-template-columns: repeat(3, 1fr);
-        grid-auto-rows: 1fr;
-        max-width: 1400px;
+        max-width: 1600px;
         margin: 0 auto;
-        align-items: stretch;
-      }
-      @media (max-width: 900px) {
-        .grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-      @media (max-width: 500px) {
-        .grid {
-          grid-template-columns: 1fr;
-        }
       }
 
+      /* Modern Cards */
       .card {
         position: relative;
-        background: #fff;
-        border: 1px solid transparent;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-        height: 100%;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s;
         display: flex;
         flex-direction: column;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        min-height: 350px;
       }
       .card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
-        border-color: #007bff;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-color: #3b82f6;
       }
+
       .chart-wrapper {
-        position: relative;
         flex: 1;
         width: 100%;
-        padding: 0;
-        display: block;
-        aspect-ratio: 4 / 3;
-        min-height: 0;
-      }
-      .chart-wrapper > div {
-        width: 100% !important;
-        height: 100% !important;
-        display: block !important;
         position: relative;
+        padding: 10px;
       }
+
       .chart-wrapper .plotly-graph-div {
-        width: 100% !important;
-        height: 100% !important;
         position: absolute !important;
         inset: 0;
+        width: 100% !important;
+        height: 100% !important;
       }
 
       .expand-btn {
         position: absolute;
         top: 12px;
         right: 12px;
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
         border: none;
-        border-radius: 4px;
-        background: transparent;
+        border-radius: 6px;
+        background: #f8fafc;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         z-index: 10;
-        transition: background 0.2s;
-        font-size: 18px;
-        color: #666;
-        font-weight: normal;
-        padding: 0;
+        color: #64748b;
       }
-      .expand-btn:hover {
-        background: rgba(0, 0, 0, 0.05);
-        color: #333;
-      }
+      .expand-btn:hover { background: #3b82f6; color: white; }
 
-      /* Modal: centered, not full-screen */
+      /* Modal Design */
       .modal-backdrop {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.4);
-        z-index: 1000;
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(4px);
+        z-index: 2000;
         align-items: center;
         justify-content: center;
         padding: 40px;
-        backdrop-filter: blur(4px);
       }
-      .modal-backdrop.show {
-        display: flex;
-      }
+      .modal-backdrop.show { display: flex; }
+
       .modal-content {
         background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        max-height: 1200px;
-        max-width: 1400px;
+        border-radius: 16px;
         width: 95vw;
-        height: 90vh;
+        height: 85vh;
         display: flex;
         flex-direction: column;
-        position: relative;
+        overflow: hidden;
       }
+
       .modal-header {
+        padding: 16px 24px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        padding: 12px 16px;
-        border-bottom: 1px solid #eee;
-        flex-shrink: 0;
-      }
-      .modal-header .modal-title {
-        margin: 0;
-        font-size: 1.1rem;
-      }
-      .modal-chart-container {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-        padding: 8px;
-      }
-      .modal-chart-container .plotly-graph-div {
-        width: 100% !important;
-        height: 100% !important;
-        min-height: 400px !important;
-        flex: 1;
+        align-items: center;
       }
 
+      .modal-chart-container { flex: 1; padding: 20px; }
       .collapse-btn {
-        width: 40px;
-        height: 40px;
-        border: none;
-        border-radius: 8px;
-        background: #f0f0f0;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        color: #333;
-      }
-      .collapse-btn:hover {
-        background: #e0e0e0;
-      }
-
-      /* Pagination */
-      .pagination {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 16px;
-        padding: 20px;
-        border-top: 1px solid #e0e0e0;
-        background: #fafafa;
-        z-index: 100;
-      }
-      .pagination button {
-        padding: 10px 20px;
-        font-size: 1rem;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        background: #fff;
-        cursor: pointer;
-      }
-      .pagination button:hover:not(:disabled) {
-        background: #f0f0f0;
-      }
-      .pagination button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-      .pagination .page-info {
-        font-size: 0.95rem;
-        color: #555;
+        border: none; background: #e2e8f0;
+        padding: 8px 12px; border-radius: 6px; cursor: pointer;
       }
     </style>
   </head>
   <body>
     <div class="dashboard-header">
-      {% if logo_path %}
-      <img src="{{ logo_path }}" alt="Logo" class="logo" />
-      {% else %}
-      <span></span>
-      {% endif %}
+      <div class="pagination">
+        <button type="button" id="prev-btn">←</button>
+        <span class="page-info"><span id="current-page-num">1</span> / {{ total_pages }}</span>
+        <button type="button" id="next-btn">→</button>
+      </div>
+
+      {% if logo_path %}<img src="{{ logo_path }}" alt="Logo" class="logo" />{% endif %}
       <h1>{{ dashboard_name }}</h1>
-      <span></span>
     </div>
 
-    {% for page in pages %} {# Save the outer loop context #} {% set parent_loop
-    = loop %}
-
-    <div
-      class="page"
-      id="dashboard-page-{{ loop.index0 }}"
-      data-page="{{ loop.index0 }}"
-    >
+    {% for page in pages %}
+    {% set parent_loop = loop %}
+    <div class="page" id="dashboard-page-{{ loop.index0 }}">
       <div class="grid">
-        {% for chart in page %} {# Use parent_loop.index0 instead of
-        loop.parent.loop.index0 #}
-        <div
-          class="card"
-          data-page="{{ parent_loop.index0 }}"
-          data-index="{{ loop.index0 }}"
-        >
+        {% for chart in page %}
+        <div class="card">
           <div class="chart-wrapper">{{ chart.html | safe }}</div>
-          <button type="button" class="expand-btn" aria-label="Expand chart" title="Expand">
-            <span class="expand-icon">⛶</span>
-          </button>
+          <button type="button" class="expand-btn" title="Expand">⛶</button>
         </div>
         {% endfor %}
       </div>
     </div>
     {% endfor %}
 
-    <div class="pagination">
-      <button type="button" id="prev-btn">Previous</button>
-      <span class="page-info"
-        >Page <span id="current-page-num">1</span> of
-        <span id="total-pages-num">{{ total_pages }}</span></span
-      >
-      <button type="button" id="next-btn">Next</button>
-    </div>
-
-    <div class="modal-backdrop" id="modal" aria-hidden="true">
+    <div class="modal-backdrop" id="modal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title" id="modal-title">Chart</h2>
-          <button
-            type="button"
-            class="collapse-btn"
-            aria-label="Collapse chart"
-            title="Collapse"
-          >
-            ⊟
-          </button>
+          <h2 id="modal-title">Chart View</h2>
+          <button type="button" class="collapse-btn">X</button>
         </div>
         <div class="modal-chart-container" id="modal-chart-container"></div>
       </div>
@@ -307,197 +222,54 @@
       (function() {
         const totalPages = {{ total_pages }};
         let currentPage = 0;
-        let expandedCard = null;
         let expandedChartWrapper = null;
-        let expandedTitle = '';
-
-        function initializeChartsOnPage(pageElement) {
-          if (!pageElement || typeof Plotly === 'undefined') return;
-          
-          // Find all Plotly chart containers on this page
-          const chartWrappers = pageElement.querySelectorAll('.chart-wrapper');
-          chartWrappers.forEach(function(wrapper) {
-            // Find the Plotly div (it's usually the first child div with an id)
-            const plotlyDiv = wrapper.querySelector('.plotly-graph-div') || 
-                             wrapper.querySelector('div[id]') ||
-                             wrapper.firstElementChild;
-            
-            if (plotlyDiv && plotlyDiv.id) {
-              // Wait for container to have dimensions
-              requestAnimationFrame(function() {
-                const container = wrapper;
-                const containerWidth = container.offsetWidth;
-                const containerHeight = container.offsetHeight;
-                
-                if (containerWidth > 0 && containerHeight > 0) {
-                  try {
-                    // Resize the chart to match its container dimensions
-                    Plotly.Plots.resize(plotlyDiv);
-                  } catch (e) {
-                    // If resize fails, the chart might need to be redrawn
-                    // This can happen if Plotly hasn't fully initialized the chart yet
-                    console.debug('Chart initialization:', e);
-                  }
-                }
-              });
-            }
-          });
-        }
 
         function showPage(idx) {
-          document.querySelectorAll('.page').forEach(function(el, i) {
-            el.classList.toggle('active', i === idx);
-          });
+          document.querySelectorAll('.page').forEach((el, i) => el.classList.toggle('active', i === idx));
           currentPage = idx;
           document.getElementById('current-page-num').textContent = idx + 1;
           document.getElementById('prev-btn').disabled = idx === 0;
           document.getElementById('next-btn').disabled = idx >= totalPages - 1;
           
-          // Lazy initialize charts on the active page
           const activePage = document.querySelector('.page.active');
-          if (activePage) {
-            // Small delay to ensure page is visible before initializing
-            setTimeout(function() {
-              initializeChartsOnPage(activePage);
-            }, 50);
-          }
+          if (activePage) setTimeout(() => resizeCharts(activePage), 50);
         }
 
-        document.getElementById('prev-btn').onclick = function() {
-          if (currentPage > 0) showPage(currentPage - 1);
-        };
-        document.getElementById('next-btn').onclick = function() {
-          if (currentPage < totalPages - 1) showPage(currentPage + 1);
-        };
-
-        function openModal(card) {
-          const wrapper = card.querySelector('.chart-wrapper');
-          const chartEl = wrapper.querySelector('.plotly-graph-div');
-          if (!chartEl) return;
-
-          expandedCard = card;
-          expandedChartWrapper = wrapper;
-
-          const container = document.getElementById('modal-chart-container');
-          container.innerHTML = '';
-          container.appendChild(chartEl); // Move the chart
-
-          document.getElementById('modal').classList.add('show');
-
-          // The "Auto-Linker": Observes when the modal container changes size
-          const ro = new ResizeObserver(() => {
-            if (typeof Plotly !== 'undefined') {
-              Plotly.Plots.resize(chartEl);
-            }
-          });
-          
-          ro.observe(container);
-          // Store observer on the element so we can disconnect it later
-          chartEl._ro = ro; 
+        function resizeCharts(container) {
+          const charts = container.querySelectorAll('.plotly-graph-div');
+          charts.forEach(chart => Plotly.Plots.resize(chart));
         }
 
-        function closeModal() {
-          if (!expandedChartWrapper) return;
-          const container = document.getElementById('modal-chart-container');
-          const chartEl = container.firstElementChild;
-          if (chartEl) expandedChartWrapper.appendChild(chartEl);
-          document.getElementById('modal').classList.remove('show');
-          document.getElementById('modal').setAttribute('aria-hidden', 'true');
-          
-          // Resize chart back to card after moving it
-          if (typeof Plotly !== 'undefined' && chartEl && chartEl.id) {
-            requestAnimationFrame(function() {
-              try {
-                Plotly.Plots.resize(chartEl);
-              } catch (e) {
-                console.debug('Chart resize on collapse:', e);
-              }
-            });
-          }
-          
-          if (expandedCard) {
-            var btn = expandedCard.querySelector('.expand-btn');
-            if (btn) setButtonExpand(btn);
-          }
-          expandedCard = null;
-          expandedChartWrapper = null;
-        }
+        document.getElementById('prev-btn').onclick = () => showPage(currentPage - 1);
+        document.getElementById('next-btn').onclick = () => showPage(currentPage + 1);
 
-        function setButtonExpand(btn) {
-          const icon = btn.querySelector('.expand-icon');
-          if (icon) icon.textContent = '⛶';
-          btn.setAttribute('aria-label', 'Expand chart');
-          btn.setAttribute('title', 'Expand');
-        }
-        function setButtonCollapse(btn) {
-          const icon = btn.querySelector('.expand-icon');
-          if (icon) icon.textContent = 'X';
-          btn.setAttribute('aria-label', 'Collapse chart');
-          btn.setAttribute('title', 'Collapse');
-        }
-
-        document.querySelectorAll('.expand-btn').forEach(function(btn) {
+        document.querySelectorAll('.expand-btn').forEach(btn => {
           btn.onclick = function() {
             const card = this.closest('.card');
-            const pageEl = card.closest('.page');
-            if (!pageEl.classList.contains('active')) return;
-            if (document.getElementById('modal').classList.contains('show') && expandedCard === card) {
-              closeModal();
-              if (expandedCard) setButtonExpand(expandedCard.querySelector('.expand-btn'));
-              return;
-            }
-            openModal(card);
-            setButtonCollapse(btn);
+            const wrapper = card.querySelector('.chart-wrapper');
+            const chart = wrapper.querySelector('.plotly-graph-div');
+            if (!chart) return;
+
+            expandedChartWrapper = wrapper;
+            const container = document.getElementById('modal-chart-container');
+            container.innerHTML = '';
+            container.appendChild(chart);
+            document.getElementById('modal').classList.add('show');
+            
+            setTimeout(() => Plotly.Plots.resize(chart), 100);
           };
         });
 
-        document.querySelector('.collapse-btn').onclick = closeModal;
-        document.getElementById('modal').onclick = function(e) {
-          if (e.target === this) closeModal();
+        document.querySelector('.collapse-btn').onclick = () => {
+          const chart = document.getElementById('modal-chart-container').firstElementChild;
+          if (chart && expandedChartWrapper) {
+            expandedChartWrapper.appendChild(chart);
+            setTimeout(() => Plotly.Plots.resize(chart), 50);
+          }
+          document.getElementById('modal').classList.remove('show');
         };
-        document.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape' && document.getElementById('modal').classList.contains('show')) closeModal();
-        });
 
-        // Initialize first page on load
         showPage(0);
-        
-        // Also initialize charts when Plotly is ready (if not already loaded)
-        if (typeof Plotly !== 'undefined') {
-          setTimeout(function() {
-            const activePage = document.querySelector('.page.active');
-            if (activePage) initializeChartsOnPage(activePage);
-          }, 200);
-        } else {
-          // Wait for Plotly to load
-          window.addEventListener('load', function() {
-            setTimeout(function() {
-              const activePage = document.querySelector('.page.active');
-              if (activePage) initializeChartsOnPage(activePage);
-            }, 100);
-          });
-        }
-        
-        // Handle window resize for responsive charts
-        let resizeTimeout;
-        window.addEventListener('resize', function() {
-          clearTimeout(resizeTimeout);
-          resizeTimeout = setTimeout(function() {
-            if (typeof Plotly !== 'undefined') {
-              const activePage = document.querySelector('.page.active');
-              if (activePage) initializeChartsOnPage(activePage);
-              // Also resize expanded chart if modal is open
-              if (document.getElementById('modal').classList.contains('show')) {
-                const modalChart = document.getElementById('modal-chart-container').firstElementChild;
-                if (modalChart && modalChart.id) {
-                  try {
-                    Plotly.Plots.resize(modalChart);
-                  } catch (e) {}
-                }
-              }
-            }
-          }, 150);
-        });
       })();
     </script>
   </body>

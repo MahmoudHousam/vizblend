@@ -8,7 +8,7 @@ setup(
     description="Seamlessly integrates Plotly interactive visualizations into a single standalone HTML file offering a modern presentation-like experience with the flexibility of a web-based report",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/MahmoudHousam/VizBlend",
+    url="https://github.com/MahmoudHousam/vizblend",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[

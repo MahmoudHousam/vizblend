@@ -2,7 +2,7 @@
 
 [![PyPI Version](https://img.shields.io/pypi/v/vizblend)](https://pypi.org/project/vizblend/) [![License](https://img.shields.io/pypi/l/vizblend)](https://github.com/MahmoudHousam/VizBlend/blob/master/LICENSE) [![Build Status](https://github.com/MahmoudHousam/VizBlend/actions/workflows/release.yml/badge.svg)](https://github.com/MahmoudHousam/VizBlend/actions) [![CI/CD](https://github.com/MahmoudHousam/VizBlend/actions/workflows/main.yml/badge.svg)](https://github.com/MahmoudHousam/VizBlend/actions) [![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.readthedocs.io/en/stable/) [![PyPI Downloads](https://static.pepy.tech/badge/vizblend)](https://pepy.tech/projects/vizblend)
 
-VizBlend is a Python package that simplifies creating interactive analytical reports by consolidating Plotly figures into a single HTML file. It’s designed to function like a modern PowerPoint presentation but with the power of stunning and interactive data visualizations.
+VizBlend is a Python package that simplifies creating interactive analytical reports and dashboards by consolidating Plotly figures into a single HTML file. It’s designed to function like a modern PowerPoint presentation but with the power of stunning and interactive data visualizations.
 
 Whether you’re a data analyst, scientist, or developer, VizBlend streamlines the visualization workflow and enhances collaboration.
 
@@ -13,20 +13,26 @@ Below is a preview of a report generated with VizBlend:
 
 ![VizBlend Thumbnail](https://cdn.jsdelivr.net/gh/MahmoudHousam/VizBlend@master/demo/preview6.gif)
 
+# Core Features
+
+- Interactive HTML Report. [Report Example](https://github.com/MahmoudHousam/vizblend/blob/master/demo/demo_report_2.py)
+- Interactive HTML dashboard (PBI-like). [Dashboard Example](https://github.com/MahmoudHousam/vizblend/blob/master/demo/demo_dashboard.py)
+- Static PPTX Report (PowerPoint-like). [PowerPoint Example](https://github.com/MahmoudHousam/vizblend/blob/master/demo/demo_pptx.py)
+
 # Installation and use case
 
-Install vizBlend using pip:
+Install vizblend using pip:
 ```
 pip install vizBlend
 ```
-Import VizBlend and add figures
+Import vizblend and add figures
 ```
 from vizblend.create_report import CreateReport  
 import plotly.graph_objects as go  
 
 report = CreateReport(report_title="Sales Report")  
 bar_fig = go.Figure(go.Bar(x=["A", "B", "C"], y=[10, 20, 30]))  
-report.add_figure(bar_fig, {"title": "Sales Data"})
+report.add_figure(bar_fig, options={"title": "Sales Data"})
 ```
 Generate the report
 ```

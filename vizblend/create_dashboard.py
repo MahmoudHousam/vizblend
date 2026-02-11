@@ -44,7 +44,9 @@ class CreateDashboard:
 
     def blend_graphs_to_html(self):
         if not self.figures:
-            raise ValueError("Add at least one figure with add_figure() before calling blend_graphs_to_html().")
+            raise ValueError(
+                "Add at least one figure with add_figure() before calling blend_graphs_to_html()."
+            )
 
         # Build chart data: HTML snippet + title per figure
         chart_items = []
@@ -83,8 +85,12 @@ class CreateDashboard:
         output_dir = "./"
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-        safe_name = "".join(c if c.isalnum() or c in " -_" else "_" for c in self.dashboard_title)
-        output_file = os.path.join(output_dir, f"{safe_name.strip() or 'dashboard'}.html")
+        safe_name = "".join(
+            c if c.isalnum() or c in " -_" else "_" for c in self.dashboard_title
+        )
+        output_file = os.path.join(
+            output_dir, f"{safe_name.strip() or 'dashboard'}.html"
+        )
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(html_content)
         return output_file

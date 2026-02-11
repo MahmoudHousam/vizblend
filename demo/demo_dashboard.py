@@ -1,4 +1,5 @@
 """Demo: build a dashboard (grid + pagination + expand) from Plotly figures."""
+
 import plotly.graph_objects as go
 from vizblend import CreateDashboard
 
@@ -11,7 +12,9 @@ scatter_fig = go.Figure(
 )
 
 pie_options = {"title": "Pie Graph"}
-pie_fig = go.Figure(go.Pie(labels=["Apples", "Bananas", "Cherries"], values=[30, 20, 50]))
+pie_fig = go.Figure(
+    go.Pie(labels=["Apples", "Bananas", "Cherries"], values=[30, 20, 50])
+)
 
 box_options = {"title": "Box Graph"}
 box_fig = go.Figure(go.Box(y=[10, 15, 20, 25, 30, 35, 40], boxpoints="all", jitter=0.3))

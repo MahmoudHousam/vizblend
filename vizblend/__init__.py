@@ -1,7 +1,15 @@
 import warnings
-import pkg_resources
+from importlib import metadata as _version
 
-version = pkg_resources.get_distribution("vizblend").version
+from vizblend.create_dashboard import CreateDashboard
+from vizblend.create_report import CreateReport
+
+__all__ = ["CreateReport", "CreateDashboard", "version"]
+
+try:
+    version = _version("vizblend")
+except Exception:
+    version = "unknown"
 
 if version < "2.0.0":
     warnings.warn(

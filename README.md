@@ -21,7 +21,7 @@ pip install vizBlend
 ```
 Import VizBlend and add figures
 ```
-from vizblend import CreateReport  
+from vizblend.create_report import CreateReport  
 import plotly.graph_objects as go  
 
 report = CreateReport(report_title="Sales Report")  
